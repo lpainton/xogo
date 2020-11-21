@@ -128,40 +128,40 @@ func mark(w http.ResponseWriter, r *http.Request, ref game.GridRef) {
 }
 
 func (s *State) updateActions() {
-	newActions := &Actions{
-		NewGame: fmt.Sprintf("%s%s", host, "new"),
-	}
-	if s.GameBoard.Winner != 0 {
+
+	newActions := &Actions{NewGame: newURL}
+
+	if s.GameBoard.Winner != game.None {
 		s.ValidActions = newActions
 		return
 	}
 
-	isMarked := s.GameBoard.Empty()
-	if !isMarked[game.TopLeft] {
+	isValid := s.GameBoard.Valid()
+	if !isValid[game.TopLeft] {
 		newActions.TopLeft = topLeftURL
 	}
-	if !isMarked[game.TopMid] {
+	if !isValid[game.TopMid] {
 		newActions.TopMid = topMidURL
 	}
-	if !isMarked[game.TopRight] {
+	if !isValid[game.TopRight] {
 		newActions.TopRight = topRightURL
 	}
-	if !isMarked[game.MidLeft] {
+	if !isValid[game.MidLeft] {
 		newActions.MidLeft = midLeftURL
 	}
-	if !isMarked[game.Center] {
+	if !isValid[game.Center] {
 		newActions.Center = centerURL
 	}
-	if !isMarked[game.MidRight] {
+	if !isValid[game.MidRight] {
 		newActions.MidRight = midRightURL
 	}
-	if !isMarked[game.BotLeft] {
+	if !isValid[game.BotLeft] {
 		newActions.BotLeft = botLeftURL
 	}
-	if !isMarked[game.BotMid] {
+	if !isValid[game.BotMid] {
 		newActions.BotMid = botMidURL
 	}
-	if !isMarked[game.BotRight] {
+	if !isValid[game.BotRight] {
 		newActions.BotRight = botRightURL
 	}
 
