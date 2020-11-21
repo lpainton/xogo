@@ -1,7 +1,7 @@
-// Package xogo implements game logic for xogo
-package xogo
+// Package game implements game logic for xogo
+package game
 
-import "encoding/json"
+import "fmt"
 
 type mark = int
 
@@ -11,7 +11,8 @@ const (
 	o    mark = iota
 )
 
-type gridSquare = int
+// GridRef indicates a square on the grid surface
+type GridRef = int
 
 const (
 	// TopLeft is the index of the top left square in the grid
@@ -39,37 +40,101 @@ type Game struct {
 	Grid   [9]mark `json:"gameGrid"`
 	Next   mark    `json:"nextMove"`
 	Winner mark    `json:"gameWinner"`
+	Pretty string  `json:"pretty"`
 }
 
 // New creates a pristine game board
 func New() *Game {
-	return &Game{Next: x}
+	g := &Game{Next: x}
+	g.pretty()
+	return g
 }
 
-// FromJSON creates a game from a provided json string
-func FromJSON(jsonString []byte) (game *Game, err error) {
-	err = json.Unmarshal(jsonString, game)
-	if err != nil {
-		return nil, err
-	}
-	return
-}
-
-// ToJSON returns a json formatted string representation of a game
-func (g *Game) ToJSON() (jsonString []byte, err error) {
-	jsonString, err = json.Marshal(g)
-	if err != nil {
-		return nil, err
-	}
-	return
-}
-
-// Move takes a gridSquare input a generates a new board which reflects the move
-func (g Game) Move(square gridSquare) (game Game, err error) {
+// Mark takes a GridRef and marks it with the next marker
+func (g *Game) Mark(square GridRef) error {
 
 	// If the square is already marked we change nothing
-	if game.Grid[square] != none {
-		return g, nil
+	if g.Grid[square] != none {
+		return nil
 	}
-	return g, nil
+
+	g.Grid[square] = g.Next
+	g.pretty()
+
+	if hasWinner(g.Grid) {
+		g.Winner = g.Next
+		g.Next = none
+		return nil
+	}
+
+	g.Next = next(g.Next)
+	return nil
+}
+
+func next(current mark) mark {
+	switch current {
+	case x:
+		return o
+	case o:
+		return x
+	}
+	return none
+}
+
+func hasWinner(grid [9]mark) bool {
+	if grid[Center] > none {
+		if (grid[TopLeft] == grid[Center] && grid[BotRight] == grid[Center]) ||
+			(grid[TopRight] == grid[Center] && grid[BotLeft] == grid[Center]) ||
+			(grid[TopMid] == grid[Center] && grid[BotMid] == grid[Center]) ||
+			(grid[MidLeft] == grid[Center] && grid[MidRight] == grid[Center]) {
+			return true
+		}
+	}
+	if grid[TopMid] > none {
+		if grid[TopLeft] == grid[TopMid] && grid[TopRight] == grid[TopMid] {
+			return true
+		}
+	}
+	if grid[BotMid] > none {
+		if grid[BotLeft] == grid[BotMid] && grid[BotRight] == grid[BotMid] {
+			return true
+		}
+	}
+	if grid[MidLeft] > none {
+		if grid[TopLeft] == grid[MidLeft] && grid[BotLeft] == grid[MidLeft] {
+			return true
+		}
+	}
+	if grid[MidRight] > none {
+		if grid[TopRight] == grid[MidRight] && grid[BotRight] == grid[MidRight] {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Game) pretty() {
+	var chars [9]rune
+	for i, v := range g.Grid {
+		switch v {
+		case none:
+			chars[i] = ' '
+		case x:
+			chars[i] = 'X'
+		case o:
+			chars[i] = 'O'
+		}
+	}
+	g.Pretty = fmt.Sprintf("%c%c%c\n%c%c%c\n%c%c%c", chars[0], chars[1], chars[2], chars[3], chars[4], chars[5], chars[6], chars[7], chars[8])
+}
+
+// Empty returns the set of empty references left
+func (g *Game) Empty() map[GridRef]bool {
+	m := make(map[GridRef]bool)
+	for i, v := range g.Grid {
+		if v != none {
+			m[i] = true
+		}
+	}
+	return m
 }
