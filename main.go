@@ -137,31 +137,31 @@ func (s *State) updateActions() {
 	}
 
 	isValid := s.GameBoard.Valid()
-	if !isValid[game.TopLeft] {
+	if isValid[game.TopLeft] {
 		newActions.TopLeft = topLeftURL
 	}
-	if !isValid[game.TopMid] {
+	if isValid[game.TopMid] {
 		newActions.TopMid = topMidURL
 	}
-	if !isValid[game.TopRight] {
+	if isValid[game.TopRight] {
 		newActions.TopRight = topRightURL
 	}
-	if !isValid[game.MidLeft] {
+	if isValid[game.MidLeft] {
 		newActions.MidLeft = midLeftURL
 	}
-	if !isValid[game.Center] {
+	if isValid[game.Center] {
 		newActions.Center = centerURL
 	}
-	if !isValid[game.MidRight] {
+	if isValid[game.MidRight] {
 		newActions.MidRight = midRightURL
 	}
-	if !isValid[game.BotLeft] {
+	if isValid[game.BotLeft] {
 		newActions.BotLeft = botLeftURL
 	}
-	if !isValid[game.BotMid] {
+	if isValid[game.BotMid] {
 		newActions.BotMid = botMidURL
 	}
-	if !isValid[game.BotRight] {
+	if isValid[game.BotRight] {
 		newActions.BotRight = botRightURL
 	}
 
